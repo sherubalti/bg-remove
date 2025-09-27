@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background Remover Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7ff 0%, #e3e6ff 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 60%);
+            transform: rotate(30deg);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+        
+        .subtitle {
+            font-weight: 300;
+            opacity: 0.9;
+            font-size: 1.2rem;
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            padding: 2.5rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+        }
+        
+        @media (min-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .upload-section, .result-section {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .drop-area {
+            width: 100%;
+            min-height: 280px;
+            border: 3px dashed var(--gray);
+            border-radius: var(--border-radius);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            padding: 2.5rem;
+        }
+        
+        .drop-area:hover, .drop-area.dragover {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+            transform: translateY(-5px);
+        }
+        
+        .drop-area i {
+            font-size: 4rem;
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .drop-area:hover i {
+            color: var(--primary);
+        }
+        
+        .drop-area p {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(67, 97, 238, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+            box-shadow: 0 7px 20px rgba(46, 204, 113, 0.4);
+        }
+        
+        .btn:disabled {
+            background-color: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .image-preview {
+            max-width: 100%;
+            max-height: 320px;
+            margin-top: 1.5rem;
+            display: none;
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-container {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            background: 
+                linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc),
+                linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .result-image {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+            border-radius: var(--border-radius);
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(67, 97, 238, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .download-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        
+        .notification {
+            padding: 1.2rem;
+            border-radius: var(--border-radius);
+            margin-top: 1.5rem;
+            display: none;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .notification.error {
+            background-color: #ffeaea;
+            color: #e74c3c;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .notification.success {
+            background-color: #eaffea;
+            color: #2ecc71;
+            border: 1px solid #c3e6cb;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+            font-size: 1rem;
+            border-top: 1px solid #eee;
+            background: var(--light);
+            width: 100%;
+        }
+        
+        .feature-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .feature i {
+            margin-right: 0.8rem;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .format-info {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--gray);
+            text-align: center;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted var(--gray);
+            cursor: help;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .credit {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Background Remover Pro</h1>
+            <p class="subtitle">Remove image backgrounds instantly with AI-powered technology</p>
+            
+            <div class="feature-list">
+                <div class="feature">
+                    <i class="fas fa-bolt"></i>
+                    <span>Fast Processing</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-star"></i>
+                    <span>High Quality</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-robot"></i>
+                    <span>100% Automatic</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure Processing</span>
+                </div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="upload-section">
+                <h2 class="section-title">
+                    <i class="fas fa-upload"></i>
+                    <span>Upload Image</span>
+                </h2>
+                <div class="drop-area" id="dropArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Drag & drop your image here</p>
+                    <p>or</p>
+                    <button class="btn" id="browseBtn">
+                        <i class="fas fa-folder-open"></i> Browse Files
+                    </button>
+                    <input type="file" id="fileInput" class="file-input" accept="image/*">
+                </div>
+                <img id="uploadedImage" class="image-preview" alt="Uploaded image">
+                <button class="btn" id="processBtn" disabled>
+                    <i class="fas fa-magic"></i> Remove Background
+                </button>
+                <p class="format-info">Supports: JPG, PNG, WEBP, GIF (Max 5MB)</p>
+                <div class="notification" id="uploadNotification"></div>
+            </div>
+            
+            <div class="result-section">
+                <h2 class="section-title">
+                    <i class="fas fa-images"></i>
+                    <span>Result</span>
+                </h2>
+                <div class="result-container">
+                    <div class="spinner" id="spinner"></div>
+                    <img id="resultImage" class="result-image" alt="Processed image">
+                    <p id="placeholderText">Processed image will appear here</p>
+                </div>
+                <div class="download-section">
+                    <button class="btn btn-success" id="downloadBtn" disabled>
+                        <i class="fas fa-download"></i> Download Image
+                    </button>
+                    <div class="credit">
+                        Powered by Remove.bg API <span class="tooltip">ℹ️
+                            <span class="tooltiptext">Background removal powered by Remove.bg service</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="notification" id="resultNotification"></div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Background Remover Pro &copy; 2023 | AI-Powered Background Removal Tool</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropArea = document.getElementById('dropArea');
+            const fileInput = document.getElementById('fileInput');
+            const browseBtn = document.getElementById('browseBtn');
+            const processBtn = document.getElementById('processBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const uploadedImage = document.getElementById('uploadedImage');
+            const resultImage = document.getElementById('resultImage');
+            const spinner = document.getElementById('spinner');
+            const placeholderText = document.getElementById('placeholderText');
+            const uploadNotification = document.getElementById('uploadNotification');
+            const resultNotification = document.getElementById('resultNotification');
+            
+            let processedImageData = null;
+            const apiKey = 'bEY8HToG53BhmuK3bSAeDnJo'; // Your Remove.bg API key
+            
+            // Click on browse button to trigger file input
+            browseBtn.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // Handle file selection
+            fileInput.addEventListener('change', handleFileSelect);
+            
+            // Drag and drop events
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dropArea.classList.add('dragover');
+            }
+            
+            function unhighlight() {
+                dropArea.classList.remove('dragover');
+            }
+            
+            dropArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            }
+            
+            function handleFileSelect(e) {
+                const files = e.target.files;
+                handleFiles(files);
+            }
+            
+            function handleFiles(files) {
+                if (files.length === 0) return;
+                
+                const file = files[0];
+                
+                // Check if file is an image
+                if (!file.type.match('image.*')) {
+                    showNotification(uploadNotification, 'Please upload an image file (JPEG, PNG, WEBP, GIF)', 'error');
+                    return;
+                }
+                
+                // Check file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification(uploadNotification, 'File size must be less than 5MB', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    uploadedImage.src = e.target.result;
+                    uploadedImage.style.display = 'block';
+                    processBtn.disabled = false;
+                    
+                    // Reset result section
+                    resultImage.style.display = 'none';
+                    placeholderText.style.display = 'block';
+                    downloadBtn.disabled = true;
+                    processedImageData = null;
+                    
+                    hideNotification(uploadNotification);
+                    hideNotification(resultNotification);
+                };
+                
+                reader.readAsDataURL(file);
+            }
+            
+            // Process image when process button is clicked
+            processBtn.addEventListener('click', processImage);
+            
+            function processImage() {
+                if (!uploadedImage.src) return;
+                
+                // Show loading spinner
+                spinner.style.display = 'block';
+                placeholderText.style.display = 'none';
+                processBtn.disabled = true;
+                hideNotification(resultNotification);
+                
+                // Convert base64 to blob for API
+                fetch(uploadedImage.src)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        // Create form data for API
+                        const formData = new FormData();
+                        formData.append('image_file', blob);
+                        
+                        // Call Remove.bg API
+                        fetch('https://api.remove.bg/v1.0/removebg', {
+                            method: 'POST',
+                            headers: {
+                                'X-Api-Key': apiKey
+                            },
+                            body: formData
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to process image: ' + response.statusText);
+                            }
+                            return response.blob();
+                        })
+                        .then(blob => {
+                            // Convert blob to data URL
+                            const reader = new FileReader();
+                            reader.onload = function() {
+                                processedImageData = reader.result;
+                                displayResult(processedImageData);
+                            };
+                            reader.readAsDataURL(blob);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            spinner.style.display = 'none';
+                            placeholderText.style.display = 'block';
+                            processBtn.disabled = false;
+                            showNotification(resultNotification, 'Error: ' + error.message, 'error');
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error converting image:', error);
+                        spinner.style.display = 'none';
+                        placeholderText.style.display = 'block';
+                        processBtn.disabled = false;
+                        showNotification(resultNotification, 'Error processing image', 'error');
+                    });
+            }
+            
+            function displayResult(imageData) {
+                resultImage.src = imageData;
+                resultImage.style.display = 'block';
+                spinner.style.display = 'none';
+                downloadBtn.disabled = false;
+                
+                showNotification(resultNotification, 'Background removed successfully!', 'success');
+            }
+            
+            // Download processed image
+            downloadBtn.addEventListener('click', downloadImage);
+            
+            function downloadImage() {
+                if (!processedImageData) return;
+                
+                // Create a temporary link for downloading
+                const link = document.createElement('a');
+                link.href = processedImageData;
+                link.download = 'background-removed.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+            function showNotification(element, message, type) {
+                element.textContent = message;
+                element.classList.add(type);
+                element.style.display = 'block';
+                
+                // Auto-hide success messages after 5 seconds
+                if (type === 'success') {
+                    setTimeout(() => {
+                        hideNotification(element);
+                    }, 5000);
+                }
+            }
+            
+            function hideNotification(element) {
+                element.style.display = 'none';
+                element.classList.remove('error', 'success');
+            }
+        });
+    </script>
+</body>
+</html>
